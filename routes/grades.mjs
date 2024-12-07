@@ -1,9 +1,10 @@
 import express from "express";
 import db from "../db/conn.mjs";
-import { ObjectId } from "mongodb";
+//import { ObjectId } from "mongodb";
+import Grades from "../models/grades.mjs";
 
 const router = express.Router();
-
+//import Learner from "../models/learners.mjs";
 // Create a single grade entry
 router.post("/", async (req, res) => {
   let collection = await db.collection("grades");
@@ -18,13 +19,22 @@ router.post("/", async (req, res) => {
   let result = await collection.insertOne(newDocument);
   res.send(result).status(204);
 });
-
+// Get all grades
+router.get('/', async (req, res) => {
+  try {
+    const grades = await Grades.find();
+    res.status(200).json(grades);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 // Get a single grade entry
 router.get("/:id", async (req, res) => {
-  let collection = await db.collection("grades");
-  let query = { _id: new ObjectId(req.params.id) };
-  let result = await collection.findOne(query);
+  // let collection = await db.collection("grades");
+  // let query = { _id: new ObjectId(req.params.id) };
+  // let result = await collection.findOne(query);
 
+  const result = await Grades.findById(req.params.id);
   if (!result) res.send("Not found").status(404);
   else res.send(result).status(200);
 });
